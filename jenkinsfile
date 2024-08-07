@@ -1,0 +1,28 @@
+pipeline {
+    agent any
+    parameters {
+        string(name: 'HOST_IP', defaultValue: '', description: 'IP address of the remote host')
+        string(name: 'USERNAME', defaultValue: '', description: 'Username for the remote host')
+        password(name: 'PASSWORD', defaultValue: '', description: 'Password for the remote host user')
+        string(name: 'SSH_KEY', defaultValue: '', description: 'SSH Key for the remote host')
+        string(name: 'PACKAGE_LIST', defaultValue: '', description: 'Comma-separated list of packages to install')
+        string(name: 'CONFIG_FILES', defaultValue: '', description: 'Comma-separated list of config files to apply')
+    }
+    stages {
+        stage('Setup Host') {
+            steps {
+                script {
+                    def packageList = params.PACKAGE_LIST.tokenize(',')
+                    def configFiles = params.CONFIG_FILES.tokenize(',')
+
+                    writeFile file: 'ansible/hosts', text: "[target]\n${params.HOST_IP} ansible_ssh_user=${params.USERNAME} ansible_ssh_pass=${params.PASSWORD}"
+
+                    ansiblePlaybook credentialsId: 'ansible-ssh-key',
+                                    inventory: "ansible/hosts",
+                                    playbook: 'ansible/playbook.yml',
+                                    extras: "-e host_ip=${params.HOST_IP} -e username=${params.USERNAME} -e password=${params.PASSWORD} -e ssh_key=${params.SSH_KEY} -e package_list=${packageList} -e config_files=${configFiles}"
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,56 @@
+# Ignore Python cache files
+__pycache__/
+*.py[cod]
+
+# Ignore Docker related files
+docker-compose.override.yml
+docker-compose.override.yaml
+
+# Ignore SSH keys
+id_rsa
+id_rsa.pub
+
+# Ignore logs
+*.log
+
+# Ignore temporary files
+*.tmp
+*.temp
+*.swp
+*.bak
+*.old
+
+# Ignore Ansible related files
+ansible/hosts
+
+# Ignore node_modules if there's any frontend part
+node_modules/
+
+# Ignore MacOS system files
+.DS_Store
+
+# Ignore IDE specific files
+.idea/
+.vscode/
+*.iml
+
+# Ignore temporary files
+*.tmp
+*.temp
+
+# Ignore any other binary or temporary files
+*.out
+*.o
+*.class
+*.exe
+*.dll
+
+# Ignore compiled libraries
+*.lo
+*.la
+*.al
+*.libs
+
+# Ignore logs and databases
+*.sql
+*.sqlite

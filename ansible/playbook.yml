@@ -1,0 +1,36 @@
+---
+- name: Setup remote host
+  hosts: target
+  become: true
+  vars:
+    ansible_ssh_user: "{{ username }}"
+    ansible_ssh_pass: "{{ password }}"
+  tasks:
+    - name: Ensure the user exists
+      user:
+        name: "{{ username }}"
+        password: "{{ password | password_hash('sha512') }}"
+        state: present
+        groups: sudo
+        append: yes
+
+    - name: Copy SSH key
+      copy:
+        content: "{{ ssh_key }}"
+        dest: "/home/{{ username }}/.ssh/authorized_keys"
+        owner: "{{ username }}"
+        mode: "0600"
+
+    - name: Install packages
+      apt:
+        name: "{{ item }}"
+        state: present
+      loop: "{{ package_list }}"
+
+    - name: Apply configuration files
+      copy:
+        src: "ansible/configs/{{ item }}"
+        dest: "/etc/{{ item }}"
+        owner: root
+        mode: "0644"
+      loop: "{{ config_files }}"

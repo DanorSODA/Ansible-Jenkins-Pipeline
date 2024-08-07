@@ -1,0 +1,14 @@
+FROM jenkins/jenkins:lts-jdk17
+USER root
+RUN apt-get update && apt-get install -y lsb-release apt-utils git vim wget curl\ 
+&& TEMP_DEB="$(mktemp)" && wget -O "$TEMP_DEB"  "https://github.com/go-task/task/releases/download/v3.18.0/task_linux_amd64.deb" \
+&& dpkg -i "$TEMP_DEB" && rm -f "$TEMP_DEB"
+RUN curl -fsSLo /usr/share/keyrings/docker-archive-keyring.asc \
+  https://download.docker.com/linux/debian/gpg
+RUN echo "deb [arch=$(dpkg --print-architecture) \
+  signed-by=/usr/share/keyrings/docker-archive-keyring.asc] \
+  https://download.docker.com/linux/debian \
+  $(lsb_release -cs) stable" > /etc/apt/sources.list.d/docker.list
+COPY id_rsa.pub  /root/.ssh/authorized_keys
+RUN apt-get update && apt-get install -y docker-ce-cli git && rm -rf /var/lib/apt/lists/* 
+RUN jenkins-plugin-cli --plugins "scm-api:690.vfc8b_54395023 git:5.2.2 workflow-aggregator:600.vb_57cdd26fdd7 pipeline-graph-view:313.v1322ce83d680"
