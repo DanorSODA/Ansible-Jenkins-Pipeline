@@ -14,10 +14,12 @@ pipeline {
                 script {
                     writeFile file: 'ansible/hosts', text: "[target]\n${params.HOST_IP} ansible_ssh_user=${params.USERNAME} ansible_ssh_pass=${params.PASSWORD}"
 
-                    ansiblePlaybook credentialsId: 'ansible-ssh-key',
-                                    inventory: "ansible/hosts",
-                                    playbook: 'ansible/playbook.yml',
-                                    extras: "-e host_ip=${params.HOST_IP} -e username=${params.USERNAME} -e password=${params.PASSWORD} -e ssh_key=${params.SSH_KEY} -e server_name=${params.SERVER_NAME} -e mysql_root_password=${params.MYSQL_ROOT_PASSWORD}"
+                    ansiblePlaybook(
+                        playbook: 'ansible/playbook.yml',
+                        inventory: "ansible/hosts",
+                        extras: "-e host_ip=${params.HOST_IP} -e username=${params.USERNAME} -e password=${params.PASSWORD} -e ssh_key=${params.SSH_KEY} -e server_name=${params.SERVER_NAME} -e mysql_root_password=${params.MYSQL_ROOT_PASSWORD}",
+                        installation: 'Ansible'
+                    )
                 }
             }
         }
