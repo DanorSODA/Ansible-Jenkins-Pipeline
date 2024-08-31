@@ -5,6 +5,11 @@
   vars:
     ansible_ssh_user: "{{ username }}"
     ansible_ssh_pass: "{{ password }}"
+    server_name: "{{ server_name | default(host_ip) }}" # Default to host IP if not provided
+    mysql_root_password: "{{ mysql_root_password | default('root_password_here') }}" # Replace with a secure password if needed
+    mysql_user: "default_user" # Default MySQL user
+    mysql_user_password: "default_password" # Default MySQL password
+    mysql_database: "app_db" # Default MySQL database name
   tasks:
     - name: Ensure the user exists
       user:
@@ -21,16 +26,65 @@
         owner: "{{ username }}"
         mode: "0600"
 
-    - name: Install packages
+    - name: Install required packages
       apt:
         name: "{{ item }}"
         state: present
-      loop: "{{ package_list }}"
+      loop:
+        - nginx
+        - mysql-server
 
-    - name: Apply configuration files
-      copy:
-        src: "ansible/configs/{{ item }}"
-        dest: "/etc/{{ item }}"
+    - name: Apply Nginx configuration
+      template:
+        src: "ansible/configs/templates/nginx.conf.j2"
+        dest: "/etc/nginx/sites-available/default"
         owner: root
         mode: "0644"
-      loop: "{{ config_files }}"
+      notify:
+        - Restart Nginx
+
+    - name: Apply MySQL configuration
+      template:
+        src: "ansible/configs/templates/my.cnf.j2"
+        dest: "/etc/mysql/mysql.conf.d/mysqld.cnf"
+        owner: mysql
+        mode: "0644"
+      notify:
+        - Restart MySQL
+
+    - name: Start and enable MySQL service
+      service:
+        name: mysql
+        state: started
+        enabled: true
+
+    - name: Set MySQL root password
+      mysql_user:
+        name: root
+        password: "{{ mysql_root_password }}"
+        login_user: root
+        login_password: ""
+      when: mysql_root_password != ""
+
+    - name: Create MySQL user
+      mysql_user:
+        name: "{{ mysql_user }}"
+        password: "{{ mysql_user_password }}"
+        priv: "{{ mysql_database }}.*:ALL"
+        state: present
+
+    - name: Create MySQL database
+      mysql_db:
+        name: "{{ mysql_database }}"
+        state: present
+
+  handlers:
+    - name: Restart Nginx
+      service:
+        name: nginx
+        state: restarted
+
+    - name: Restart MySQL
+      service:
+        name: mysql
+        state: restarted

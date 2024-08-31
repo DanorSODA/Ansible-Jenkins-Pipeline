@@ -1,0 +1,11 @@
+[mysqld]
+user            = mysql
+bind-address    = 0.0.0.0  # Allow connections from any IP address
+port            = 3306
+max_connections = 100 
+
+# Logging settings
+log_error = /var/log/mysql/error.log
+
+# Additional custom configurations
+{{ custom_mysql_configs }}
