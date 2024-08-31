@@ -34,8 +34,8 @@ docker compose up -d --build
 - Go to Manage Jenkins > Manage Plugins.
   Install the following plugins:
 
-- Ansible
-- Git
+  Ansible
+  Git
 
 ### Step 5: Create Multi-Branch Pipeline
 
@@ -46,4 +46,4 @@ docker compose up -d --build
 
 ### Step 6: Run the Pipeline
 
-    Run the Jenkins job manually or allow it to be triggered based on repository changes.
+ Run the Jenkins job manually or allow it to be triggered based on repository changes.
