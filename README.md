@@ -31,3 +31,6 @@ This project automates the setup and configuration of a remote host using Jenkin
 
 - **Error Handling**: Current setup lacks robust error handling and logging.
 - **Documentation**: Needs improvement, especially around Ansible roles and Jenkins configurations.
+
+- [Install file](INSTALL.md)
+- [Contributiors](CONTRIBUTIONS.md)
